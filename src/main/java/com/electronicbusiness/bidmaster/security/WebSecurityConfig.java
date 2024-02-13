@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
   private static final String[] WHITE_LIST_URLS = {
-    "/api/auth/**", "/swagger-ui/**", "/webjars/**", "/swagger-ui.html"
+    "/api/auth/**", "/swagger-ui/**", "/webjars/**", "/v3/api-docs/**"
   };
   private final JwtAuthenticationFilter jwtAuthFilter;
   private final AuthenticationProvider authenticationProvider;
