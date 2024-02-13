@@ -1,0 +1,29 @@
+version: '3'
+
+networks:
+  my-network:
+    driver: bridge
+
+services:
+  bid-master:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mariadb
+    networks:
+      - my-network
+
+  mariadb:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bid_master
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - my-network
+
+volumes:
+  mariadb-data:
