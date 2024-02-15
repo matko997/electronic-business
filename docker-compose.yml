@@ -24,6 +24,16 @@ services:
       - mariadb-data:/var/lib/mysql
     networks:
       - my-network
+  pma:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "9000:80"
+    environment:
+      PMA_HOST: mariadb
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - my-network
 
 volumes:
   mariadb-data:
