@@ -3,16 +3,19 @@ package com.electronicbusiness.bidmaster.exception;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
   @Override
@@ -27,5 +30,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             .collect(Collectors.toList());
     var errorResponse = new ErrorResponse(errors);
     return ResponseEntity.badRequest().body(errorResponse);
+  }
+
+  @ExceptionHandler(ValidationException.class)
+  public ResponseEntity<Object> handleValidationException(ValidationException validationException) {
+    var errorResponse = new ErrorResponse(List.of(validationException.getMessage()));
+    return ResponseEntity.badRequest().body(errorResponse);
+  }
+
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<Object> handleGeneralException(Exception exception) {
+    log.error("Exception: {}", exception.getLocalizedMessage());
+    return ResponseEntity.internalServerError().body(null);
   }
 }

@@ -2,6 +2,7 @@ package com.electronicbusiness.bidmaster.config;
 
 import com.electronicbusiness.bidmaster.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableConfigurationProperties(PusherProperties.class)
 public class AppConfig {
   private final UserDetailsServiceImpl userDetailsService;
 

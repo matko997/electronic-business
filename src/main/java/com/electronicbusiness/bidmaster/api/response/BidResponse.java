@@ -1,3 +1,4 @@
 package com.electronicbusiness.bidmaster.api.response;
 
-public record BidResponse(String bidder, double amount, double bidDifference) {}
+public record BidResponse(
+    long id, long auctionId, String bidder, double amount, double bidDifference) {}

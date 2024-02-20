@@ -9,6 +9,12 @@ services:
     build: .
     ports:
       - "8080:8080"
+    environment:
+      - PUSHER_APP_ID=
+      - PUSHER_KEY=
+      - PUSHER_SECRET=
+      - PUSHER_CLUSTER=
+      - PUSHER_ENCRYPTED=
     depends_on:
       - mariadb
     networks:

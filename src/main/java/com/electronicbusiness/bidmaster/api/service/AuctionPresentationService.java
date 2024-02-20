@@ -2,12 +2,14 @@ package com.electronicbusiness.bidmaster.api.service;
 
 import com.electronicbusiness.bidmaster.api.response.*;
 import com.electronicbusiness.bidmaster.model.*;
-import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuctionPresentationService {
+  private final BidPresentationService bidPresentationService;
 
   public AuctionResponse createAuctionResponse(Auction auction) {
     BusinessAsset auctionAsset = auction.getAsset();
@@ -20,11 +22,13 @@ public class AuctionPresentationService {
 
     UserResponse userResponse = new UserResponse(owner.getUsername());
 
+    List<BidResponse> bidResponseList = bidPresentationService.bidList(auction);
+
     return new AuctionResponse(
         auction.getId(),
         auction.getTitle(),
         auction.highestBidAmount(),
-        bidHistoryResponse(auction),
+        bidResponseList,
         assetResponse,
         auction.getStatus(),
         auctionConfigResponse,
@@ -36,8 +40,8 @@ public class AuctionPresentationService {
         auctionConfig.getId(),
         auctionConfig.getStartingPrice(),
         auctionConfig.getMinimalBiddingStep(),
-        auctionConfig.getStartTime(),
-        auctionConfig.getEndTime());
+        auctionConfig.getStartTime().toString(),
+        auctionConfig.getEndTime().toString());
   }
 
   private AssetResponse assetResponse(Auction auction, BusinessAsset auctionAsset) {
@@ -47,23 +51,5 @@ public class AuctionPresentationService {
         auctionAsset.getShortDescription(),
         auctionAsset.getDetailedDescription(),
         auctionAsset.getImages().stream().map(BusinessAssetImage::getImage).toList());
-  }
-
-  private List<BidResponse> bidHistoryResponse(Auction auction) {
-    List<BidResponse> bidHistory = new ArrayList<>();
-
-    List<Bid> bids = auction.getBids();
-
-    double previousBidAmount = auction.getConfig().getStartingPrice();
-
-    for (Bid bid : bids) {
-      double bidDifference = Math.abs(bid.getAmount() - previousBidAmount);
-      BidResponse bidResponse =
-          new BidResponse(bid.getBidder().getUsername(), bid.getAmount(), bidDifference);
-      bidHistory.add(bidResponse);
-      previousBidAmount = bid.getAmount();
-    }
-
-    return bidHistory;
   }
 }

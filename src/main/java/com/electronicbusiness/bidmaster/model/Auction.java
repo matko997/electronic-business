@@ -1,5 +1,6 @@
 package com.electronicbusiness.bidmaster.model;
 
+import static com.electronicbusiness.bidmaster.model.enumeration.AuctionStatus.IN_PROGRESS;
 import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.*;
@@ -44,14 +45,21 @@ public class Auction {
   @JoinColumn(name = "auction_config_id", referencedColumnName = "id")
   private AuctionConfig config;
 
-  @ManyToOne(fetch = LAZY) private User owner;
+  @ManyToOne(fetch = LAZY)
+  private User owner;
 
   @CreationTimestamp private LocalDateTime createdAt;
 
   @UpdateTimestamp private LocalDateTime updatedAt;
 
   public double highestBidAmount() {
-    return bids.stream().max(Comparator.comparingDouble(Bid::getAmount)).map(Bid::getAmount).orElse(0.0);
+    return bids.stream()
+        .max(Comparator.comparingDouble(Bid::getAmount))
+        .map(Bid::getAmount)
+        .orElse(config.getStartingPrice());
   }
 
+  public boolean isAuctionInProgress() {
+    return status == IN_PROGRESS;
+  }
 }

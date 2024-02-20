@@ -1,6 +1,5 @@
 package com.electronicbusiness.bidmaster.model;
 
-
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -33,9 +32,13 @@ public class Bid {
   @Column(columnDefinition = "decimal")
   private double amount;
 
-  @CreationTimestamp
-  private LocalDateTime createdAt;
+  @CreationTimestamp private LocalDateTime createdAt;
 
-  @UpdateTimestamp
-  private LocalDateTime updatedAt;
+  @UpdateTimestamp private LocalDateTime updatedAt;
+
+  public Bid(Auction auction, User bidder, double amount) {
+    this.auction = auction;
+    this.bidder = bidder;
+    this.amount = amount;
+  }
 }
