@@ -1,13 +1,13 @@
 package com.electronicbusiness.bidmaster.exception;
 
+import static org.springframework.http.HttpStatus.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,5 +42,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   public ResponseEntity<Object> handleGeneralException(Exception exception) {
     log.error("Exception: {}", exception.getLocalizedMessage());
     return ResponseEntity.internalServerError().body(null);
+  }
+
+  @ExceptionHandler(EntityNotFoundException.class)
+  public ResponseEntity<Object> handleGeneralException(
+      EntityNotFoundException entityNotFoundException) {
+    var errorResponse = new ErrorResponse(List.of(entityNotFoundException.getMessage()));
+    return new ResponseEntity<>(errorResponse, NOT_FOUND);
   }
 }

@@ -5,11 +5,11 @@ import static org.springframework.http.HttpStatus.CREATED;
 import com.electronicbusiness.bidmaster.api.request.AuctionRequest;
 import com.electronicbusiness.bidmaster.api.response.*;
 import com.electronicbusiness.bidmaster.api.service.AuctionPresentationService;
+import com.electronicbusiness.bidmaster.exception.EntityNotFoundException;
 import com.electronicbusiness.bidmaster.model.*;
 import com.electronicbusiness.bidmaster.security.JwtService;
 import com.electronicbusiness.bidmaster.service.AuctionService;
 import com.electronicbusiness.bidmaster.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,10 @@ public class AuctionController {
       @RequestPart("imageFile") List<MultipartFile> assetImages)
       throws IOException {
     String username = jwtService.extractUsername(authHeader.substring(7));
-    User user = userService.findByUsername(username).orElseThrow();
+    User user =
+        userService
+            .findByUsername(username)
+            .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(username)));
     List<byte[]> images = new ArrayList<>();
     for (MultipartFile imageFile : assetImages) {
       images.add(imageFile.getBytes());
@@ -48,7 +51,11 @@ public class AuctionController {
 
   @GetMapping("/{auctionId}")
   public AuctionResponse getOne(@PathVariable long auctionId) {
-    Auction auction = auctionService.findById(auctionId).orElseThrow(EntityNotFoundException::new);
+    Auction auction =
+        auctionService
+            .findById(auctionId)
+            .orElseThrow(
+                () -> new EntityNotFoundException(Auction.class, String.valueOf(auctionId)));
     return auctionPresentationService.createAuctionResponse(auction);
   }
 
