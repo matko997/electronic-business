@@ -7,6 +7,7 @@ import com.electronicbusiness.bidmaster.api.request.AuctionConfigRequest;
 import com.electronicbusiness.bidmaster.api.request.AuctionRequest;
 import com.electronicbusiness.bidmaster.model.*;
 import com.electronicbusiness.bidmaster.repository.AuctionRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,26 @@ public class AuctionService {
 
   public List<Auction> findAll() {
     return auctionRepository.findAll();
+  }
+
+  public void startAuctions() {
+    List<Auction> readyToStartAuctions = findReadyToStartAuctions();
+    readyToStartAuctions.forEach(auction -> auction.setStatus(IN_PROGRESS));
+    auctionRepository.saveAll(readyToStartAuctions);
+  }
+
+  public void closeAuctions() {
+    List<Auction> readyToCloseAuctions = findReadyToCloseAuctions();
+    readyToCloseAuctions.forEach(auction -> auction.setStatus(CLOSED));
+    auctionRepository.saveAll(readyToCloseAuctions);
+  }
+
+  private List<Auction> findReadyToStartAuctions() {
+    return auctionRepository.findAllByStatusAndConfigStartTimeBefore(CREATED, LocalDateTime.now());
+  }
+
+  private List<Auction> findReadyToCloseAuctions() {
+    return auctionRepository.findAllByStatusAndConfigEndTimeBefore(IN_PROGRESS, LocalDateTime.now());
   }
 
   private Auction createAuction(
