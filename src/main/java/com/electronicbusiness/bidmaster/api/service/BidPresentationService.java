@@ -39,6 +39,19 @@ public class BidPresentationService {
         bid.getAuction().getId(),
         bid.getBidder().getUsername(),
         bid.getAmount(),
-        (bid.getAuction().highestBidAmount() - bid.getAmount()) + bid.getAmount());
+        (bidDifference(bid.getAuction())));
+  }
+
+  private double bidDifference(Auction auction) {
+    if (auction.getBids().isEmpty()) {
+      return 0;
+    }
+    if (auction.getBids().size() == 1) {
+      return Math.abs(
+          auction.getBids().get(0).getAmount() - auction.getConfig().getStartingPrice());
+    }
+    return Math.abs(
+        auction.getBids().get(auction.getBids().size() - 1).getAmount()
+            - auction.getBids().get(auction.getBids().size() - 2).getAmount());
   }
 }
