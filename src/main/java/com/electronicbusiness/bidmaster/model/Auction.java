@@ -60,4 +60,12 @@ public class Auction {
   public boolean isAuctionInProgress() {
     return status == IN_PROGRESS;
   }
+
+  public List<User> bidders() {
+    return bids.stream().map(Bid::getBidder).toList();
+  }
+
+  public Optional<User> highestBidder() {
+    return bids.stream().max(Comparator.comparingDouble(Bid::getAmount)).map(Bid::getBidder);
+  }
 }

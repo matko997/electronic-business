@@ -32,4 +32,13 @@ public class BidPresentationService {
 
     return bidHistory;
   }
+
+  public BidResponse bidSingle(Bid bid) {
+    return new BidResponse(
+        bid.getId(),
+        bid.getAuction().getId(),
+        bid.getBidder().getUsername(),
+        bid.getAmount(),
+        (bid.getAuction().highestBidAmount() - bid.getAmount()) + bid.getAmount());
+  }
 }

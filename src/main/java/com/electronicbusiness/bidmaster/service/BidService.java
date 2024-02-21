@@ -27,7 +27,7 @@ public class BidService {
       throw new BidValidationException("Bid amount must be greater than starting price");
     }
 
-    Optional<Bid> highestBid = bidRepository.findFirstByOrderByAmountDesc();
+    Optional<Bid> highestBid = bidRepository.findFirstByAuctionOrderByAmountDesc(auction);
 
     if (highestBid.isPresent() && bidRequest.amount() <= highestBid.get().getAmount()) {
       throw new BidValidationException("Bid amount must be greater than highest current bid");

@@ -3,8 +3,6 @@ package com.electronicbusiness.bidmaster.api.controller;
 import static org.springframework.http.HttpStatus.CREATED;
 
 import com.electronicbusiness.bidmaster.api.request.BidRequest;
-import com.electronicbusiness.bidmaster.api.response.BidResponse;
-import com.electronicbusiness.bidmaster.api.service.BidPresentationService;
 import com.electronicbusiness.bidmaster.exception.EntityNotFoundException;
 import com.electronicbusiness.bidmaster.model.Auction;
 import com.electronicbusiness.bidmaster.model.Bid;
@@ -13,9 +11,7 @@ import com.electronicbusiness.bidmaster.security.JwtService;
 import com.electronicbusiness.bidmaster.service.AuctionService;
 import com.electronicbusiness.bidmaster.service.BidService;
 import com.electronicbusiness.bidmaster.service.UserService;
-import com.pusher.rest.Pusher;
-import com.pusher.rest.data.Event;
-import java.util.List;
+import com.electronicbusiness.bidmaster.thirdparty.pusher.service.PusherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,8 +24,7 @@ public class BidController {
   private final BidService bidService;
   private final JwtService jwtService;
   private final UserService userService;
-  private final BidPresentationService bidPresentationService;
-  private final Pusher pusher;
+  private final PusherService pusherService;
 
   @PostMapping("/{auctionId}")
   @ResponseStatus(CREATED)
@@ -48,8 +43,6 @@ public class BidController {
             .findByUsername(username)
             .orElseThrow(() -> new EntityNotFoundException(User.class, username));
     Bid savedBid = bidService.create(auction, bidRequest, bidder);
-    List<BidResponse> bidResponseList = bidPresentationService.bidList(savedBid.getAuction());
-    Event pusherEvent = new Event("bids", "bidCreated", bidResponseList);
-    pusher.trigger(List.of(pusherEvent));
+    pusherService.sendBidCreatedNotification(savedBid);
   }
 }

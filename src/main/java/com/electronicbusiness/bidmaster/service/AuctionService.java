@@ -7,6 +7,7 @@ import com.electronicbusiness.bidmaster.api.request.AuctionConfigRequest;
 import com.electronicbusiness.bidmaster.api.request.AuctionRequest;
 import com.electronicbusiness.bidmaster.model.*;
 import com.electronicbusiness.bidmaster.repository.AuctionRepository;
+import com.electronicbusiness.bidmaster.thirdparty.pusher.service.PusherService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class AuctionService {
 
   private final AuctionRepository auctionRepository;
+  private final PusherService pusherService;
 
   public Auction create(AuctionRequest auctionRequest, User user) {
     BusinessAsset asset = createAsset(auctionRequest);
@@ -36,14 +38,22 @@ public class AuctionService {
 
   public void startAuctions() {
     List<Auction> readyToStartAuctions = findReadyToStartAuctions();
+    if (readyToStartAuctions.isEmpty()) {
+      return;
+    }
     readyToStartAuctions.forEach(auction -> auction.setStatus(IN_PROGRESS));
     auctionRepository.saveAll(readyToStartAuctions);
+    pusherService.sendAuctionStartedNotification(readyToStartAuctions);
   }
 
   public void closeAuctions() {
     List<Auction> readyToCloseAuctions = findReadyToCloseAuctions();
+    if (readyToCloseAuctions.isEmpty()) {
+      return;
+    }
     readyToCloseAuctions.forEach(auction -> auction.setStatus(CLOSED));
     auctionRepository.saveAll(readyToCloseAuctions);
+    pusherService.sendAuctionFinishedNotification(readyToCloseAuctions);
   }
 
   private List<Auction> findReadyToStartAuctions() {
@@ -51,7 +61,8 @@ public class AuctionService {
   }
 
   private List<Auction> findReadyToCloseAuctions() {
-    return auctionRepository.findAllByStatusAndConfigEndTimeBefore(IN_PROGRESS, LocalDateTime.now());
+    return auctionRepository.findAllByStatusAndConfigEndTimeBefore(
+        IN_PROGRESS, LocalDateTime.now());
   }
 
   private Auction createAuction(
