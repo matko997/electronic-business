@@ -7,6 +7,8 @@ import com.electronicbusiness.bidmaster.model.enumeration.Role;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +33,9 @@ public class User {
   @Enumerated(STRING)
   @Column(columnDefinition = "varchar")
   private Role role;
+
+  @OneToMany(mappedBy = "user")
+  private List<Notification> notifications = new ArrayList<>();
 
   @CreationTimestamp private LocalDateTime createdAt;
   @UpdateTimestamp private LocalDateTime updatedAt;
